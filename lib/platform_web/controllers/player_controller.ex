@@ -62,17 +62,17 @@ defmodule PlatformWeb.PlayerController do
   end
 
   def authorise(conn, _opts) do
-    current_player_id = conn.assigns.current_user.id
+    current_user = conn.assigns.current_user
 
     requested_player_id =
       conn.path_params["id"]
       |> String.to_integer()
 
-    if current_player_id == requested_player_id do
+    if current_user && current_user.id == requested_player_id do
       conn
     else
       conn
-      |> put_flash(:error, "Your account is not authorised to access that page.")
+      |> put_flash(:error, "You have no access to that page.")
       |> redirect(to: page_path(conn, :index))
       |> halt()
     end
