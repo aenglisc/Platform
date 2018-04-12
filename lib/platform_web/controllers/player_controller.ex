@@ -4,6 +4,8 @@ defmodule PlatformWeb.PlayerController do
   alias Platform.Accounts
   alias Platform.Accounts.Player
 
+  plug(:authorise when action in [:edit, :update, :delete])
+
   def index(conn, _params) do
     players = Accounts.list_players()
     render(conn, "index.html", players: players)
@@ -57,5 +59,22 @@ defmodule PlatformWeb.PlayerController do
     conn
     |> put_flash(:info, "Player deleted successfully.")
     |> redirect(to: player_path(conn, :index))
+  end
+
+  def authorise(conn, _opts) do
+    current_player_id = conn.assigns.current_user.id
+
+    requested_player_id =
+      conn.path_params["id"]
+      |> String.to_integer()
+
+    if current_player_id == requested_player_id do
+      conn
+    else
+      conn
+      |> put_flash(:error, "Your account is not authorised to access that page.")
+      |> redirect(to: page_path(conn, :index))
+      |> halt()
+    end
   end
 end
