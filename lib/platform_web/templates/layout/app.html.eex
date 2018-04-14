@@ -18,7 +18,7 @@
           <%= link "Platform", to: page_path(@conn, :index), class: "logo" %>
           <ul class="nav nav-pills pull-right">
             <%= if @current_user do %>
-              <%= link @current_user.username, to: player_path(@conn, :show, @current_user.id), class: "btn btn-sm btn-info" %>
+              <%= link @current_user.username, to: player_path(@conn, :edit, @current_user.id), class: "btn btn-sm btn-info" %>
               <%= link "Sign Out", to: player_session_path(@conn, :delete, @current_user), method: "delete", class: "btn btn-sm btn-danger" %>
             <% else %>
               <%= link "Sign Up", to: player_path(@conn, :new), class: "btn btn-sm btn-success" %>
