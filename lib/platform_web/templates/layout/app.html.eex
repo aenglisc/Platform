@@ -7,17 +7,18 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Hello Platform!</title>
+    <title>Platform</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
   </head>
 
   <body>
-    <div class="container">
+    <div class="container-fluid">
       <header class="header">
         <nav role="navigation">
+          <%= link "Platform", to: page_path(@conn, :index), class: "logo" %>
           <ul class="nav nav-pills pull-right">
             <%= if @current_user do %>
-              <p class="small">Signed in as <strong><%= @current_user.username %></strong></p>
+              <%= link @current_user.username, to: player_path(@conn, :show, @current_user.id), class: "btn btn-sm btn-info" %>
               <%= link "Sign Out", to: player_session_path(@conn, :delete, @current_user), method: "delete", class: "btn btn-sm btn-danger" %>
             <% else %>
               <%= link "Sign Up", to: player_path(@conn, :new), class: "btn btn-sm btn-success" %>
@@ -25,7 +26,6 @@
             <% end %>
           </ul>
         </nav>
-        <a href="/"><span class="logo"></span></a>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
