@@ -10,7 +10,7 @@
     </tr>
   </thead>
   <tbody>
-<%= for player <- @players do %>
+    <%= for player <- @players do %>
     <tr>
       <td><%= player.username %></td>
       <td><%= player.score %></td>
@@ -21,7 +21,7 @@
         <span><%= link "Delete", to: player_path(@conn, :delete, player), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
       </td>
     </tr>
-<% end %>
+    <% end %>
   </tbody>
 </table>
 

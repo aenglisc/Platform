@@ -1,13 +1,17 @@
 defmodule Platform.Products.Game do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
-
+  alias Platform.Products.Gameplay
+  alias Platform.Accounts.Player
 
   schema "games" do
-    field :description, :string
-    field :featured, :boolean, default: false
-    field :thumbnail, :string
-    field :title, :string
+    many_to_many(:players, Player, join_through: Gameplay)
+
+    field(:description, :string)
+    field(:featured, :boolean, default: false)
+    field(:thumbnail, :string)
+    field(:title, :string)
 
     timestamps()
   end

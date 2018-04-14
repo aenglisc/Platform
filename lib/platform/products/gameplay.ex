@@ -1,14 +1,14 @@
 defmodule Platform.Products.Gameplay do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
   alias Platform.Accounts.Player
   alias Platform.Products.Game
 
-
   schema "gameplays" do
-    belongs_to :player, Player
-    belongs_to :game, Game
-    field :player_score, :integer, default: 0
+    belongs_to(:player, Player)
+    belongs_to(:game, Game)
+    field(:player_score, :integer, default: 0)
 
     timestamps()
   end

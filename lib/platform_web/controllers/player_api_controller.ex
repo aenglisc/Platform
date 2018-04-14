@@ -4,10 +4,10 @@ defmodule PlatformWeb.PlayerApiController do
   alias Platform.Accounts
   alias Platform.Accounts.Player
 
-  action_fallback PlatformWeb.FallbackController
+  action_fallback(PlatformWeb.FallbackController)
 
   def index(conn, _params) do
-    players = Accounts.list_players
+    players = Accounts.list_players()
     render(conn, "index.json", players: players)
   end
 

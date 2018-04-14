@@ -1,18 +1,17 @@
 defmodule Platform.Accounts.Player do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
-
   alias Platform.Products.{Game, Gameplay}
 
-
   schema "players" do
-    many_to_many :games, Game, join_through: Gameplay
+    many_to_many(:games, Game, join_through: Gameplay)
 
-    field :display_name, :string
-    field :password, :string, virtual: true
-    field :password_digest, :string
-    field :score, :integer, default: 0
-    field :username, :string, unique: true
+    field(:display_name, :string)
+    field(:password, :string, virtual: true)
+    field(:password_digest, :string)
+    field(:score, :integer, default: 0)
+    field(:username, :string, unique: true)
 
     timestamps()
   end
@@ -42,8 +41,9 @@ defmodule Platform.Accounts.Player do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
         put_change(changeset, :password_digest, Comeonin.Bcrypt.hashpwsalt(pass))
+
       _ ->
-        changeset  
+        changeset
     end
   end
 end
