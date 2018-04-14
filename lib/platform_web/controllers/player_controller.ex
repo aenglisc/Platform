@@ -73,7 +73,7 @@ defmodule PlatformWeb.PlayerController do
     else
       conn
       |> put_flash(:error, "You have no access to that page.")
-      |> redirect(to: page_path(conn, :index))
+      |> redirect(to: player_path(conn, :index))
       |> halt()
     end
   end
