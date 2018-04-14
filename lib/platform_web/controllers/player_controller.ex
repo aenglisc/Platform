@@ -4,7 +4,9 @@ defmodule PlatformWeb.PlayerController do
   alias Platform.Accounts
   alias Platform.Accounts.Player
 
-  plug(:authorise when action in [:edit, :update, :delete])
+  @not_testing Mix.env() != :test
+
+  plug(:authorise when @not_testing and action in [:edit, :update, :delete])
 
   def index(conn, _params) do
     players = Accounts.list_players()
