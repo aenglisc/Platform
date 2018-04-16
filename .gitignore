@@ -6,7 +6,7 @@
 
 #Elm
 /assets/elm-stuff
-/assets/js/main.js
+/assets/js/elm.js
 
 # Generated on crash by the VM
 erl_crash.dump
