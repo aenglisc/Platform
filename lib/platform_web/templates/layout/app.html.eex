@@ -15,17 +15,20 @@
     <div class="container-fluid">
       <header class="header">
         <nav role="navigation">
-          <%= link "Platform", to: page_path(@conn, :index), class: "logo" %>
           <ul class="nav nav-pills pull-right">
             <%= if @current_user do %>
-              <%= link @current_user.username, to: player_path(@conn, :edit, @current_user.id), class: "btn btn-sm btn-info" %>
-              <%= link "Sign Out", to: player_session_path(@conn, :delete, @current_user), method: "delete", class: "btn btn-sm btn-danger" %>
+              Signed in as
+              <strong><%= link @current_user.username, to: player_path(@conn, :edit, @current_user) %></strong>
+              &nbsp;
+              <%= link "Sign Out", to: player_session_path(@conn, :delete, @current_user), method: "delete", class: "btn navbar-btn btn-danger" %>
             <% else %>
-              <%= link "Sign Up", to: player_path(@conn, :new), class: "btn btn-sm btn-success" %>
-              <%= link "Sign In", to: player_session_path(@conn, :new), class: "btn btn-sm btn-primary" %>
+              <%= link "Sign Up", to: player_path(@conn, :new), class: "btn navbar-btn btn-success" %>
+              &nbsp;
+              <%= link "Sign In", to: player_session_path(@conn, :new), class: "btn navbar-btn btn-primary" %>
             <% end %>
           </ul>
         </nav>
+        <%= link "Platform", to: page_path(@conn, :index), class: "logo" %>
       </header>
 
       <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
