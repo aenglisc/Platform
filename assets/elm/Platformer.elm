@@ -201,9 +201,9 @@ viewCharacter model =
         characterImage =
             case model.characterDirection of
                 Left ->
-                    "/images/character-left.gif"
+                    "/images/phoenix-left.png"
                 Right ->
-                    "/images/character-right.gif"
+                    "/images/phoenix-right.png"
     in
         image
             [ xlinkHref characterImage
