@@ -80,7 +80,7 @@ update msg model =
             ( model, Cmd.none )
         
         CountdownTimer time ->
-            if model.timeRemaining > 0 then
+            if model.timeRemaining > 0 && model.gameState == Playing then
                 ( { model | timeRemaining = model.timeRemaining - 1 }, Cmd.none )
             else
                 ( model, Cmd.none )
@@ -93,27 +93,44 @@ update msg model =
                     }
                 , Random.generate SetNewItemPositionX (Random.int 50 500)
                 )
+            else if model.itemsCollected >= 10 then
+                ( { model | gameState = Success }, Cmd.none )
+            else if model.timeRemaining == 0 then
+                ( { model | gameState = GameOver }, Cmd.none )
             else
                 ( model, Cmd.none )
 
         SetNewItemPositionX newPositionX ->
             ( { model | itemPositionX = newPositionX }, Cmd.none )
 
+        KeyDown 32 ->
+            if model.gameState /= Playing then
+                ( { initialModel | gameState = Playing } , Cmd.none )
+            else
+                ( model, Cmd.none )
+
         KeyDown 37 ->
-            ( { model
-                | characterDirection = Left
-                , characterPositionX = model.characterPositionX - 15
-                }
-            , Cmd.none
-            )
+            if model.gameState == Playing then
+                ( { model
+                    | characterDirection = Left
+                    , characterPositionX = model.characterPositionX - 15
+                    }
+                , Cmd.none
+                )
+            else
+                ( model, Cmd.none )
         
         KeyDown 39 ->
-            ( { model
-                | characterDirection = Right
-                , characterPositionX = model.characterPositionX + 15
-                }
-            , Cmd.none
-            )
+            if model.gameState == Playing then
+                ( { model
+                    | characterDirection = Right
+                    , characterPositionX = model.characterPositionX + 15
+                    }
+                , Cmd.none
+                )
+            else
+                (model, Cmd.none)
+
             
         KeyDown _ ->
             (model, Cmd.none)
@@ -153,15 +170,7 @@ view model =
 viewGame : Model -> Svg Msg
 viewGame model =
     svg [ version " 1.1", width "600", height "400" ]
-        [ viewGameWindow
-        , viewGameSky
-        , viewGameGround
-        , viewCharacter model
-        , viewItem model
-        , viewGameScore model
-        , viewItemsCollected model
-        , viewGameTime model
-        ]
+        ( viewGameState model )
 
 viewGameWindow : Svg Msg
 viewGameWindow =
@@ -282,3 +291,65 @@ viewGameText positionX positionY str =
         , fontSize "16"
         ]
         [ Svg.text str ]
+
+viewGameState : Model -> List (Svg Msg)
+viewGameState model =
+    case model.gameState of
+        StartScreen ->
+            [ viewGameWindow
+            , viewGameSky
+            , viewGameGround
+            , viewCharacter model
+            , viewItem model
+            , viewStartScreen
+            ]
+        
+        Playing ->
+            [ viewGameWindow
+            , viewGameSky
+            , viewGameGround
+            , viewCharacter model
+            , viewItem model
+            , viewGameScore model
+            , viewItemsCollected model
+            , viewGameTime model
+            ]
+
+        Success ->
+            [ viewGameWindow
+            , viewGameSky
+            , viewGameGround
+            , viewCharacter model
+            , viewItem model
+            , viewSuccessScreenText
+            ]
+
+        GameOver ->
+            [ viewGameWindow
+            , viewGameSky
+            , viewGameGround
+            , viewCharacter model
+            , viewItem model
+            , viewGameOverScreenText
+            ]
+
+viewStartScreen : Svg Msg
+viewStartScreen =
+    Svg.svg []
+        [ viewGameText 140 160 "Collect 10 coins in 10 seconds!"
+        , viewGameText 140 180 "Press the SPACE BAR key to start"
+        ]
+
+viewSuccessScreenText : Svg Msg
+viewSuccessScreenText =
+    Svg.svg []
+        [ viewGameText 260 160 "Well done!"
+        , viewGameText 140 180 "Press the SPACE BAR key to restart"
+        ]
+
+viewGameOverScreenText : Svg Msg
+viewGameOverScreenText =
+    Svg.svg []
+        [ viewGameText 260 160 "Game Over"
+        , viewGameText 140 180 "Press the SPACE BAR key to restart"
+        ]
