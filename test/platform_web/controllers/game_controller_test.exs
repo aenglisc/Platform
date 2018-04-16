@@ -53,6 +53,7 @@ defmodule PlatformWeb.GameControllerTest do
                "id" => id,
                "description" => "some description",
                "featured" => true,
+               "slug" => "some-slug",
                "thumbnail" => "some thumbnail",
                "title" => "some title"
              }
@@ -77,6 +78,7 @@ defmodule PlatformWeb.GameControllerTest do
                "id" => id,
                "description" => "some updated description",
                "featured" => false,
+               "slug" => "some-slug",
                "thumbnail" => "some updated thumbnail",
                "title" => "some updated title"
              }
