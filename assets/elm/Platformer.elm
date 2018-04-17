@@ -4,6 +4,7 @@ import AnimationFrame exposing (diffs)
 import Html exposing (Html, button, div, li, span, strong, ul)
 import Html.Attributes
 import Html.Events exposing (onClick)
+import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Keyboard exposing (KeyCode, downs)
@@ -48,6 +49,7 @@ type alias Model =
     { characterDirection : Direction
     , characterPositionX : Int
     , characterPositionY : Int
+    , errors : String
     , gameplays : List Gameplay
     , gameState : GameState
     , itemPositionX : Int
@@ -69,6 +71,7 @@ initialModel flags =
     { characterDirection = Right
     , characterPositionX = 50
     , characterPositionY = 300
+    , errors = ""
     , gameplays = []
     , gameState = StartScreen
     , itemPositionX = 500
@@ -107,7 +110,11 @@ initialChannel =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags = 
-    ( initialModel flags, Cmd.map PhoenixMsg (initialSocketCommand flags) )
+    ( initialModel flags, Cmd.batch
+        [ fetchGameplaysList
+        , Cmd.map PhoenixMsg (initialSocketCommand flags)
+        ]
+    )
 
 
 -- UPDATE
@@ -115,6 +122,7 @@ init flags =
 type Msg
     = NoOp
     | CountdownTimer Time
+    | FetchGameplaysList (Result Http.Error (List Gameplay))
     | KeyDown KeyCode
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | ReceiveScoreChanges Encode.Value
@@ -130,6 +138,12 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        FetchGameplaysList (Ok gameplays) ->
+            ( { model | gameplays = gameplays }, Cmd.none )
+
+        FetchGameplaysList (Err message) ->
+            ( { model | errors = (toString message) }, Cmd.none )
         
         CountdownTimer time ->
             if model.timeRemaining > 0 && model.gameState == Playing then
@@ -229,7 +243,7 @@ update msg model =
                 ( model, Cmd.none )
 
         ReceiveScoreChanges raw ->
-            case Decode.decodeValue gameplayDecoder raw of
+            case Decode.decodeValue decodeGameplay raw of
                 Ok scoreChange ->
                     ( { model | gameplays = scoreChange :: model.gameplays }, Cmd.none )
                 
@@ -237,8 +251,19 @@ update msg model =
                     Debug.log "Error receiving score changes"
                         ( model, Cmd.none )
 
-gameplayDecoder : Decode.Decoder Gameplay
-gameplayDecoder =
+fetchGameplaysList : Cmd Msg
+fetchGameplaysList =
+    Http.get "/api/gameplays" decodeGameplaysList
+        |> Http.send FetchGameplaysList
+
+decodeGameplaysList : Decode.Decoder (List Gameplay)
+decodeGameplaysList =
+    decodeGameplay
+        |> Decode.list
+        |> Decode.at [ "data" ]
+
+decodeGameplay : Decode.Decoder Gameplay
+decodeGameplay =
     Decode.map3 Gameplay
         (Decode.field "game_id" Decode.int)
         (Decode.field "player_id" Decode.int)
@@ -277,19 +302,22 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewGame model
-        , viewSaveScoreButton
+        , viewSaveScoreButton model
         , viewGameplaysIndex model
         ]
 
-viewSaveScoreButton : Html Msg
-viewSaveScoreButton =
-    div []
-        [ button
-            [ onClick SaveScoreRequest
-            , class "btn btn-primary"
+viewSaveScoreButton : Model -> Html Msg
+viewSaveScoreButton model =
+    if model.gameState == Success || model.gameState == GameOver then
+        div []
+            [ button
+                [ onClick SaveScoreRequest
+                , class "btn btn-primary"
+                ]
+                [ text "Save Score" ]
             ]
-            [ text "Save Score" ]
-        ]
+    else
+        div [] []
 
 viewGameplaysIndex : Model -> Html Msg
 viewGameplaysIndex model =
