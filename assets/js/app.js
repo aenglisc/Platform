@@ -5,4 +5,4 @@ const elmContainer = document.querySelector('#elm-container');
 if (elmContainer) Elm.Main.embed(elmContainer);
 
 const platformer = document.querySelector("#platformer");
-if (platformer) Elm.Platformer.embed(platformer);
+if (platformer) Elm.Platformer.embed(platformer, { token: window.userToken });
